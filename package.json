@@ -1,5 +1,5 @@
 {
-  "name": "BadKitty API",
+  "name": "badkitty-api",
   "version": "1.0.0",
   "description": "",
   "main": "./app.js",
