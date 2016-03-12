@@ -5,7 +5,6 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 var express = require('express');
 var path = require('path');
 var config = require('./config/environment');
-var twitterCfg = require('./config');
 
 var app = express();
 
@@ -15,8 +14,6 @@ require('./routes.js')(app);
 app.listen(process.env.PORT || 80);
 app.set('view engine', 'jade');
 app.use(express.static(path.join(__dirname, 'public')));
-app.set('config', twitterCfg);
-
 
 app.on('connection', function(socket) {
   console.log('connection made');
