@@ -1,49 +1,71 @@
-'use strict'
 
-process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 var express = require('express');
 var path = require('path');
-var config = require('./config/environment');
+var favicon = require('serve-favicon');
+var logger = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
 
-var socket = require('socket.io-client')('https://www.mctl.gq:3000');
+var routes = require('./routes/index');
+var audioStream = require('./routes/audio-stream');
 
 var app = express();
-var server = require('http').Server(app);
- 
-var io = require('socket.io')(server);
 
+var env = process.env.NODE_ENV || 'development';
+app.locals.ENV = env;
+app.locals.ENV_DEVELOPMENT = env == 'development';
 
+// view engine setup
 
-
-
-
-require('./config/express')(app);
-require('./routes.js')(app);
-
-app.listen(process.env.PORT || 80);
+app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
+
+// app.use(favicon(__dirname + '/public/img/favicon.ico'));
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.on('connection', function(socket) {
-  console.log('connection made');
-  socket.setTimeout(100);
-});
-console.log('Listening on ' + config.port + ' in ' + app.get('env') + ' mode...');
+app.use('/', routes);
+app.use('/api/audio-stream', audioStream);
 
-  socket.on('connect', function(){});
-  socket.on('event', function(data){});
-  socket.on('disconnect', function(){});
-socket.emit('last-track');
-socket.on('new-track', function(data) {
-    console.log(data);
+/// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
 });
 
-io.on('connection', function (socket) {
-  socket.emit('news', { hello: 'world' });
-  socket.on('my other event', function (data) {
-    console.log(data);
-  });
+/// error handlers
+
+// development error handler
+// will print stacktrace
+
+if (app.get('env') === 'development') {
+    app.use(function(err, req, res, next) {
+        res.status(err.status || 500);
+        res.render('error', {
+            message: err.message,
+            error: err,
+            title: 'error'
+        });
+    });
+}
+
+// production error handler
+// no stacktraces leaked to user
+app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.render('error', {
+        message: err.message,
+        error: {},
+        title: 'error'
+    });
 });
 
-exports = module.exports = app;
+
+module.exports = app;
