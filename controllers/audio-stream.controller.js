@@ -76,7 +76,7 @@ function parseStream (body) {
 function getAccessTokenOptions(req)
 {
   return {
-    uri : 'https://api.twitch.tv/api/channels/' + req.params.name +'/access_token',
+    uri : 'https://api.twitch.tv/api/channels/' + req.params.name +'/access_token?client_id=d5rwsazyfhc3cqhpx94zmf5iyqicino',
     method: 'GET',
     headers: {'user-agent': 'node.js'},
     transform: parseAccessToken,
